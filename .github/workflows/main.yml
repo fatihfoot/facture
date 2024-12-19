@@ -1,0 +1,44 @@
+name: Build Flutter APK
+
+on:
+  push:
+    branches:
+      - main # يمكنك تغيير الفرع إلى أي فرع آخر تعمل عليه
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # تشغيل العمل على نظام أوبونتو
+
+    steps:
+    # 1. التحقق من الكود المصدري
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    # 2. إعداد بيئة Flutter
+    - name: Setup Flutter Environment
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: 'stable' # تثبيت أحدث إصدار ثابت من Flutter
+
+    # 3. قبول تراخيص Android
+    - name: Accept Android Licenses
+      run: yes | flutter doctor --android-licenses
+
+    # 4. فحص إعدادات Flutter
+    - name: Flutter Doctor Check
+      run: flutter doctor
+
+    # 5. تثبيت التبعيات
+    - name: Install Dependencies
+      run: flutter pub get
+
+    # 6. بناء ملف APK
+    - name: Build APK
+      run: flutter build apk --release
+
+    # 7. رفع ملف APK كـ Artifact
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v3 # استخدام الإصدار المحدث
+      with:
+        name: app-release.apk # اسم الملف عند الرفع
+        path: build/app/outputs/flutter-apk/app-release.apk # مسار ملف APK

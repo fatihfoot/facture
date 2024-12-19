@@ -1,0 +1,37 @@
+name: Build Flutter APK
+
+on:
+  push:
+    branches:
+      - main # فرع Git الذي سيتم تنفيذ العملية عند دفع التغييرات إليه (يمكن تغييره حسب الحاجة)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # تشغيل البيئة على نظام أوبونتو
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Setup Flutter Environment
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: 'stable' # تثبيت الإصدار الثابت من Flutter
+
+    - name: Accept Android Licenses
+      run: yes | flutter doctor --android-licenses # قبول التراخيص الخاصة بـ Android
+
+    - name: Flutter Doctor Check
+      run: flutter doctor # التأكد من أن Flutter مثبت بشكل صحيح
+
+    - name: Install Dependencies
+      run: flutter pub get # تثبيت الحزم اللازمة
+
+    - name: Build APK
+      run: flutter build apk --release # بناء التطبيق كملف APK في وضع الإصدار
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: app-release.apk # اسم ملف APK عند رفعه
+        path: build/app/outputs/flutter-apk/app-release.apk # المسار إلى ملف APK
